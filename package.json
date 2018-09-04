@@ -1,0 +1,10 @@
+{
+  "name": "realworld-example-app-react",
+  "version": "0.0.1",
+  "description": "This is a medium.com clone, an example of a realworld app, for more details visit realworld.io",
+  "main": "index.js",
+  "repository": "https://github.com/segmentationfaulter/realworld-example-app-react.git",
+  "author": "segmentationfaulter <muhammadsackib@gmail.com>",
+  "license": "MIT",
+  "private": false
+}
