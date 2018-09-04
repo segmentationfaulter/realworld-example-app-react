@@ -23,5 +23,8 @@ module.exports = {
       template: './index.html'
     })
   ],
-  devtool: 'inline-source-map'
+  devtool: 'inline-source-map',
+  devServer: {
+    contentBase: './dist'
+  }
 }
