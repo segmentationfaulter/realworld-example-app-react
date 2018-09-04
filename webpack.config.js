@@ -22,5 +22,6 @@ module.exports = {
       title: 'Conduit',
       template: './index.html'
     })
-  ]
+  ],
+  devtool: 'inline-source-map'
 }
