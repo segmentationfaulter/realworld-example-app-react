@@ -1,5 +1,6 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const webpack = require('webpack')
 
 module.exports = {
   entry: './src/index.js',
@@ -14,6 +15,10 @@ module.exports = {
         test: /\.js$/,
         exclude: /node_modules/,
         loader: 'babel-loader'
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
       }
     ]
   },
@@ -21,10 +26,12 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'Conduit',
       template: './index.html'
-    })
+    }),
+    new webpack.HotModuleReplacementPlugin()
   ],
-  devtool: 'inline-source-map',
+  devtool: 'eval-source-map',
   devServer: {
-    contentBase: './dist'
+    contentBase: './dist',
+    hot: true
   }
 }
