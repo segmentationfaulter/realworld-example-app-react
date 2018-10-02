@@ -1,14 +1,14 @@
 import React from 'react'
 import { Router } from '@reach/router'
 
-import Register from './views/Register'
+import RegistrationForm from './views/RegistrationForm'
 
 export default class App extends React.Component {
   render () {
     return (
       <div>
         <Router>
-          <Register path='/register' />
+          <RegistrationForm path='/register' />
         </Router>
       </div>
     )
