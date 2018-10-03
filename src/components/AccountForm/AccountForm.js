@@ -42,18 +42,15 @@ export default class AccountForm extends React.Component {
     } catch (err) {
       if (err.response) {
         const errors = err.response.data.errors
-        if (errors.username) {
-          return this.setState({ errorMessage: `username ${errors.username[0]}` })
-        }
-        if (errors.email) {
-          return this.setState({ errorMessage: `email ${errors.email[0]}` })
-        }
-        if (errors.password) {
-          return this.setState({ errorMessage: `password ${errors.email[0]}` })
-        }
-        if (errors['email or password']) {
-          return this.setState({ errorMessage: `email or password ${errors['email or password'][0]}` })
-        }
+        this.handleError(errors)
+      }
+    }
+  }
+
+  handleError (errors) {
+    for (let pointOfError in errors) {
+      if (errors.hasOwnProperty(pointOfError)) {
+        return this.setState({ errorMessage: `${pointOfError} ${errors[pointOfError][0]}` })
       }
     }
   }
