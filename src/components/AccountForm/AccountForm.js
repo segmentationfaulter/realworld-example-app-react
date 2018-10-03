@@ -44,14 +44,16 @@ export default class AccountForm extends React.Component {
     } catch (err) {
       if (err.response) {
         const errors = err.response.data.errors
-        this.handleHTTPError(errors)
+        return this.handleHTTPError(errors)
+      } else {
+        return this.setState({ errorMessage: 'I do not know what went wrong' })
       }
     }
 
     try {
-      setAuthenticationToek(response.user.token)
+      return setAuthenticationToek(response.user.token)
     } catch (err) {
-      this.setState({ errorMessage: 'Authentication token could not be stored in your browser' })
+      return this.setState({ errorMessage: 'Authentication token could not be stored in your browser' })
     }
   }
 
