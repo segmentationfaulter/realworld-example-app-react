@@ -49,7 +49,7 @@ export default class AccountForm extends React.Component {
     }
 
     try {
-      setAuthenticationToek(response.token)
+      setAuthenticationToek(response.user.token)
     } catch (err) {
       this.setState({ errorMessage: 'Authentication token could not be stored in your browser' })
     }
