@@ -1,6 +1,8 @@
 import React from 'react'
 import axios from 'axios'
+
 import { getRegistrationUrl, getLoginUrl } from '../../urls'
+import { setAuthenticationToek } from '../../lib/authToken'
 
 export default class AccountForm extends React.Component {
   constructor (props) {
@@ -38,16 +40,22 @@ export default class AccountForm extends React.Component {
     }
 
     try {
-      const { data } = await axios(requestConfig)
+      var { data: response } = await axios(requestConfig)
     } catch (err) {
       if (err.response) {
         const errors = err.response.data.errors
-        this.handleError(errors)
+        this.handleHTTPError(errors)
       }
+    }
+
+    try {
+      setAuthenticationToek(response.token)
+    } catch (err) {
+      this.setState({ errorMessage: 'Authentication token could not be stored in your browser' })
     }
   }
 
-  handleError (errors) {
+  handleHTTPError (errors) {
     for (let pointOfError in errors) {
       if (errors.hasOwnProperty(pointOfError)) {
         return this.setState({ errorMessage: `${pointOfError} ${errors[pointOfError][0]}` })
