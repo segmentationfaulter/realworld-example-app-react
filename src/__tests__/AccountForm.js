@@ -20,6 +20,7 @@ test('Account form works', async () => {
 
   const { getByPlaceholderText, container } = render(<AccountForm navigate={navigateMock} />)
   const form = container.querySelector('form')
+  const submitButton = container.querySelector('button')
   const usernameField = getByPlaceholderText(/username/i)
   const emailField = getByPlaceholderText(/email/i)
   const passwordField = getByPlaceholderText(/password/i)
@@ -47,8 +48,11 @@ test('Account form works', async () => {
   expect(usernameField.value).toBe(usernameFieldChangeEventValue.target.value)
   expect(emailField.value).toBe(emailFieldChangeEventValue.target.value)
   expect(passwordField.value).toBe(passwordFieldChangeEventValue.target.value)
+  expect(submitButton.hasAttribute('disabled')).toBeFalsy()
 
   fireEvent.submit(form)
+
+  expect(submitButton.hasAttribute('disabled')).toBeTruthy()
   expect(axios).toHaveBeenCalled()
   expect(axios).toHaveBeenCalledTimes(1)
   expect(axios).toHaveBeenCalledWith({
