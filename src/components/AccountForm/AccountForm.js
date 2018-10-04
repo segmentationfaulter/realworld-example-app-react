@@ -132,7 +132,7 @@ function ErrorMessage ({ message }) {
 
 function Form ({ username, email, password, onChange, onSubmit, loginOnly }) {
   return (
-    <form onSubmit={onSubmit}>
+    <form onSubmit={onSubmit} onChange={onChange}>
       {!loginOnly &&
         <fieldset className='form-group'>
           <input
@@ -140,7 +140,6 @@ function Form ({ username, email, password, onChange, onSubmit, loginOnly }) {
             type='text'
             placeholder='Your username'
             name='username'
-            onChange={onChange}
             required
           />
         </fieldset>
@@ -151,7 +150,6 @@ function Form ({ username, email, password, onChange, onSubmit, loginOnly }) {
           type='email'
           placeholder='Email'
           name='email'
-          onChange={onChange}
           required
         />
       </fieldset>
@@ -161,7 +159,6 @@ function Form ({ username, email, password, onChange, onSubmit, loginOnly }) {
           type='password'
           placeholder='Password'
           name='password'
-          onChange={onChange}
           required
         />
       </fieldset>
