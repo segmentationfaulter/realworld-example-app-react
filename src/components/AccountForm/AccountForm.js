@@ -42,6 +42,7 @@ export default class AccountForm extends React.Component {
     try {
       var { data: response } = await axios(requestConfig)
       setAuthenticationToken(response.user.token)
+      this.props.navigate('/')
     } catch (err) {
       if (err.response) {
         const errors = err.response.data.errors

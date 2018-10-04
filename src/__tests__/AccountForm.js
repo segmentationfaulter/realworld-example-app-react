@@ -16,8 +16,9 @@ test('Account form works', async () => {
     }
   }
   axios.mockImplementation(() => Promise.resolve(apiResponse))
+  const navigateMock = jest.fn()
 
-  const { getByPlaceholderText, container } = render(<AccountForm />)
+  const { getByPlaceholderText, container } = render(<AccountForm navigate={navigateMock} />)
   const form = container.querySelector('form')
   const usernameField = getByPlaceholderText(/username/i)
   const emailField = getByPlaceholderText(/email/i)
@@ -64,4 +65,7 @@ test('Account form works', async () => {
   expect(axios()).resolves.toBe(apiResponse)
   await wait(() => expect(getAuthenticationToken()).not.toBeNull())
   expect(getAuthenticationToken()).toBe(apiResponse.data.user.token)
+  expect(navigateMock).toHaveBeenCalled()
+  expect(navigateMock).toHaveBeenCalledTimes(1)
+  expect(navigateMock).toHaveBeenCalledWith('/')
 })
