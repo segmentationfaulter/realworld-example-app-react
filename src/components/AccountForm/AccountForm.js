@@ -11,7 +11,8 @@ export default class AccountForm extends React.Component {
       username: '',
       email: '',
       password: '',
-      errorMessage: null
+      errorMessage: null,
+      apiRequestInFlight: false
     }
 
     this.handleFormInputsChange = this.handleFormInputsChange.bind(this)
@@ -20,6 +21,7 @@ export default class AccountForm extends React.Component {
 
   async handleFormSubmission (submissionEvent) {
     submissionEvent.preventDefault()
+    this.setState({ apiRequestInFlight: true })
     const { loginOnly } = this.props
     const { email, password, username } = this.state
 
@@ -56,7 +58,10 @@ export default class AccountForm extends React.Component {
   handleHTTPError (errors) {
     for (let pointOfError in errors) {
       if (errors.hasOwnProperty(pointOfError)) {
-        return this.setState({ errorMessage: `${pointOfError} ${errors[pointOfError][0]}` })
+        return this.setState({
+          errorMessage: `${pointOfError} ${errors[pointOfError][0]}`,
+          apiRequestInFlight: false
+        })
       }
     }
   }
@@ -78,7 +83,8 @@ export default class AccountForm extends React.Component {
       username,
       email,
       password,
-      errorMessage
+      errorMessage,
+      apiRequestInFlight
     } = this.state
 
     return (
@@ -96,6 +102,7 @@ export default class AccountForm extends React.Component {
                 password={password}
                 loginOnly={loginOnly}
                 onSubmit={this.handleFormSubmission}
+                apiRequestInFlight={apiRequestInFlight}
               />
             </div>
           </div>
@@ -126,7 +133,7 @@ function ErrorMessage ({ message }) {
   )
 }
 
-function Form ({ username, email, password, onChange, onSubmit, loginOnly }) {
+function Form ({ username, email, password, onChange, onSubmit, loginOnly, apiRequestInFlight }) {
   return (
     <form onSubmit={onSubmit} onChange={onChange}>
       {!loginOnly &&
@@ -158,7 +165,10 @@ function Form ({ username, email, password, onChange, onSubmit, loginOnly }) {
           required
         />
       </fieldset>
-      <button className='btn btn-lg btn-primary pull-xs-right'>
+      <button
+        className='btn btn-lg btn-primary pull-xs-right'
+        disabled={apiRequestInFlight}
+      >
         {loginOnly ? 'Sing in' : 'Sign up'}
       </button>
     </form>
