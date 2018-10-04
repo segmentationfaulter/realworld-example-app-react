@@ -1,6 +1,6 @@
 const AUTH_TOEKN_FIELD_NAME = '__JWT_TOKEN__'
 
-export function setAuthenticationToek (token) {
+export function setAuthenticationToken (token) {
   window.localStorage.setItem(AUTH_TOEKN_FIELD_NAME, token)
 }
 

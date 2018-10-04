@@ -2,7 +2,7 @@ import React from 'react'
 import axios from 'axios'
 
 import { getRegistrationUrl, getLoginUrl } from '../../urls'
-import { setAuthenticationToek } from '../../lib/authToken'
+import { setAuthenticationToken } from '../../lib/authToken'
 
 export default class AccountForm extends React.Component {
   constructor (props) {
@@ -41,6 +41,7 @@ export default class AccountForm extends React.Component {
 
     try {
       var { data: response } = await axios(requestConfig)
+      setAuthenticationToken(response.user.token)
     } catch (err) {
       if (err.response) {
         const errors = err.response.data.errors
@@ -48,12 +49,6 @@ export default class AccountForm extends React.Component {
       } else {
         return this.setState({ errorMessage: 'I do not know what went wrong' })
       }
-    }
-
-    try {
-      return setAuthenticationToek(response.user.token)
-    } catch (err) {
-      return this.setState({ errorMessage: 'Authentication token could not be stored in your browser' })
     }
   }
 
