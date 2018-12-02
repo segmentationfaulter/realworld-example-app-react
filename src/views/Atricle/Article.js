@@ -5,31 +5,24 @@ import ArticleBanner from './ArticleBanner'
 import ArticleContents from './ArticleContents'
 import ArticleActions from './ArticleActions'
 import ArticleComments from './ArticleComments'
-import { getArticlesUrl, getUserFollowingUrl } from '../../urls'
+import { getArticlesUrl, getAuthorFollowingUrl } from '../../urls'
 import { getAuthenticationToken } from '../../lib/authToken'
 
 export default class Article extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      title: null,
-      body: null,
-      tagList: [],
-      authorImageUrl: null,
-      createdAt: null,
-      favoritesCount: null,
-      username: null,
-      followingAuthor: null,
+      article: null,
       followingRequestInFlight: false
     }
 
-    this.handleFollowingUser = this.handleFollowingUser.bind(this)
+    this.handleFollowingAuthor = this.handleFollowingAuthor.bind(this)
   }
 
-  async handleFollowingUser (username, followingAuthor) {
+  async handleFollowingAuthor (authorUsername, followingAuthor) {
     this.setState({ followingRequestInFlight: true })
 
-    const apiEndpoint = getUserFollowingUrl(username)
+    const apiEndpoint = getAuthorFollowingUrl(authorUsername)
     const requestConfig = {
       url: apiEndpoint,
       method: followingAuthor ? 'delete' : 'post',
@@ -51,60 +44,32 @@ export default class Article extends React.Component {
   }
 
   async componentDidMount () {
+    const article = await this.fetchArticle()
+    this.setState({ article })
+  }
+
+  async fetchArticle () {
     const { slug } = this.props
     const apiEndpoint = getArticlesUrl(slug)
-    const { data } = await axios.get(apiEndpoint)
     const {
-      body,
-      createdAt,
-      description,
-      favorited,
-      favoritesCount,
-      tagList,
-      title,
-      author: {
-        bio,
-        following,
-        image,
-        username
+      data: {
+        article
       }
-    } = data.article
-
-    this.setState({
-      title,
-      body,
-      tagList: this.state.tagList.concat(tagList),
-      authorImageUrl: image,
-      createdAt,
-      favoritesCount,
-      username,
-      followingAuthor: following
-    })
+    } = await axios.get(apiEndpoint)
+    return article
   }
 
   render () {
     const {
-      title,
-      body,
-      tagList,
-      authorImageUrl,
-      createdAt,
-      favoritesCount,
-      username,
-      followingAuthor,
+      article,
       followingRequestInFlight
     } = this.state
 
     return (
       <div className='article-page'>
         <ArticleBanner
-          title={title}
-          authorImageUrl={authorImageUrl}
-          createdAt={createdAt}
-          favoritesCount={favoritesCount}
-          username={username}
-          onFollowingUser={this.handleFollowingUser}
-          followingAuthor={followingAuthor}
+          article={article}
+          onFollowingUser={this.handleFollowingAuthor}
           followingRequestInFlight={followingRequestInFlight}
         />
         <div className='container page'>

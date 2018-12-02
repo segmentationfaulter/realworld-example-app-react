@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function ArticleActions () {
+export default function ArticleActions ({ userLoggedIn, postAuthor }) {
   return (
     <div className='article-actions'>
       <div className='article-meta'>

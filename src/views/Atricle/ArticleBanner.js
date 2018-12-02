@@ -2,17 +2,23 @@ import React from 'react'
 import { Link } from '@reach/router'
 
 export default function ArticleBanner ({
-  title,
-  authorImageUrl,
-  username,
-  createdAt,
-  favoritesCount,
+  article,
   onFollowingUser,
   onFavoringPost,
-  followingAuthor,
   followingRequestInFlight
 }) {
-  const profilePagePath = `/profile/:${username}`
+  if (!article) return null
+  const {
+    title,
+    createdAt,
+    favoritesCount,
+    author: {
+      username: authorUsername,
+      image,
+      following: followingAuthor
+    }
+  } = article
+  const profilePagePath = `/profile/:${authorUsername}`
 
   return (
     <div className='banner'>
@@ -21,18 +27,18 @@ export default function ArticleBanner ({
         <h1>{title}</h1>
 
         <div className='article-meta'>
-          <Link to={profilePagePath}><img src={authorImageUrl} /></Link>
+          <Link to={profilePagePath}><img src={image} /></Link>
           <div className='info'>
-            <Link to={profilePagePath} className='author'>{username}</Link>
+            <Link to={profilePagePath} className='author'>{authorUsername}</Link>
             <span className='date'>{formatDate(createdAt)}</span>
           </div>
           <button
             className='btn btn-sm btn-outline-secondary'
-            onClick={() => onFollowingUser(username, followingAuthor)}
+            onClick={() => onFollowingUser(authorUsername, followingAuthor)}
             disabled={followingRequestInFlight}
           >
             <i className='ion-plus-round' />
-            {getFollowButtonLabel(followingAuthor, username)}
+            {getFollowButtonLabel(followingAuthor, authorUsername)}
           </button>
           &nbsp;&nbsp;
           <button className='btn btn-sm btn-outline-primary'>
@@ -47,10 +53,10 @@ export default function ArticleBanner ({
   )
 }
 
-function getFollowButtonLabel (followingAuthor, username) {
+function getFollowButtonLabel (followingAuthor, authorUsername) {
   return followingAuthor
-    ? `Unfollow ${username}`
-    : `Follow ${username}`
+    ? `Unfollow ${authorUsername}`
+    : `Follow ${authorUsername}`
 }
 
 function formatDate (date) {

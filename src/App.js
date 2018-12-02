@@ -15,15 +15,15 @@ export default class App extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      user: null,
+      userLoggedIn: null,
       userResolved: false
     }
   }
 
   async componentDidMount () {
-    const user = await this.fetchUser()
-    if (user) {
-      this.setState({ user, userResolved: true })
+    const userLoggedIn = await this.fetchUser()
+    if (userLoggedIn) {
+      this.setState({ userLoggedIn, userResolved: true })
     }
   }
 
@@ -49,7 +49,7 @@ export default class App extends React.Component {
 
   render () {
     const {
-      user,
+      userLoggedIn,
       userResolved
     } = this.state
 
@@ -62,7 +62,7 @@ export default class App extends React.Component {
           <RegistrationForm path='/register' />
           <LoginForm path='/login' />
           <Editor path='/editor' />
-          <Article path='/article/:slug' user={user} />
+          <Article path='/article/:slug' userLoggedIn={userLoggedIn} />
         </Router>
       </div>
     )
