@@ -16,19 +16,23 @@ export default class App extends React.Component {
     super(props)
     this.state = {
       user: null,
-      fetchingUser: false
+      userResolved: false
     }
   }
 
   async componentDidMount () {
-    this.setState({ fetchingUser: true })
     const user = await this.fetchUser()
-    this.setState({ user }, () => this.setState({ fetchingUser: false }))
+    if (user) {
+      this.setState({ user, userResolved: true })
+    }
   }
 
   async fetchUser () {
     const authToken = getAuthenticationToken()
-    if (!authToken) return
+    if (!authToken) {
+      this.setState({ userResolved: true })
+      return null
+    }
     const requestConfig = {
       url: getCurrentUserUrl(),
       method: 'get',
@@ -46,10 +50,10 @@ export default class App extends React.Component {
   render () {
     const {
       user,
-      fetchingUser
+      userResolved
     } = this.state
 
-    if (fetchingUser) return null
+    if (!userResolved) return null
 
     return (
       <div>
