@@ -6,9 +6,10 @@ module.exports = {
   entry: './src/index.js',
   output: {
     filename: 'main.js',
-    path: path.resolve(__dirname, 'dist')
+    path: path.resolve(__dirname, 'dist'),
+    publicPath: '/'
   },
-  mode: "development",
+  mode: 'development',
   module: {
     rules: [
       {
@@ -31,7 +32,7 @@ module.exports = {
   ],
   devtool: 'eval-source-map',
   devServer: {
-    contentBase: './dist',
+    contentBase: path.join(__dirname, 'dist'),
     historyApiFallback: true,
     hot: true
   }

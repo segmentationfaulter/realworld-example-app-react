@@ -49,7 +49,8 @@ export default class Editor extends React.Component {
     }
 
     try {
-      await axios(requestConfig)
+      const { data } = await axios(requestConfig)
+      await this.props.navigate(`/article/${data.article.slug}`)
     } catch (err) {
       this.setState({ apiRequestInFlight: false })
     }
