@@ -37,9 +37,12 @@ export default class Article extends React.Component {
       }
     } = await axios(requestConfig)
 
-    this.setState({
-      followingAuthor: profile.following,
-      followingRequestInFlight: false
+    this.setState((prevState) => {
+      prevState.article.author = profile
+      return {
+        article: prevState.article,
+        followingRequestInFlight: false
+      }
     })
   }
 
@@ -51,11 +54,18 @@ export default class Article extends React.Component {
   async fetchArticle () {
     const { slug } = this.props
     const apiEndpoint = getArticlesUrl(slug)
+    const requestConfig = {}
+    const authToken = getAuthenticationToken()
+    if (authToken) {
+      requestConfig.headers = {
+        Authorization: `Token ${authToken}`
+      }
+    }
     const {
       data: {
         article
       }
-    } = await axios.get(apiEndpoint)
+    } = await axios.get(apiEndpoint, requestConfig)
     return article
   }
 
@@ -65,17 +75,26 @@ export default class Article extends React.Component {
       followingRequestInFlight
     } = this.state
 
+    const { userLoggedIn } = this.props
+
     return (
       <div className='article-page'>
         <ArticleBanner
           article={article}
-          onFollowingUser={this.handleFollowingAuthor}
           followingRequestInFlight={followingRequestInFlight}
+          userLoggedIn={userLoggedIn}
+          onFollowingAuthor={this.handleFollowingAuthor}
         />
         <div className='container page'>
           <ArticleContents />
           <hr />
-          <ArticleActions />
+          <ArticleActions
+            onFollowingAuthor={this.handleFollowingAuthor}
+            followingRequestInFlight={followingRequestInFlight}
+            userLoggedIn={userLoggedIn}
+            article={article}
+            centeralize
+          />
           <ArticleComments />
         </div>
       </div>
