@@ -5,7 +5,7 @@ import ArticleBanner from './ArticleBanner'
 import ArticleContents from './ArticleContents'
 import ArticleActions from './ArticleActions'
 import ArticleComments from './ArticleComments'
-import { getArticlesUrl, getAuthorFollowingUrl } from '../../urls'
+import { getArticlesUrl, getAuthorFollowingUrl, getArticleFovoritingUrl } from '../../urls'
 import { getAuthenticationToken } from '../../lib/authToken'
 
 export default class Article extends React.Component {
@@ -13,10 +13,12 @@ export default class Article extends React.Component {
     super(props)
     this.state = {
       article: null,
-      followingRequestInFlight: false
+      followingRequestInFlight: false,
+      favoritingRequestInFlight: false
     }
 
     this.handleFollowingAuthor = this.handleFollowingAuthor.bind(this)
+    this.handleArticleFavoriting = this.handleArticleFavoriting.bind(this)
   }
 
   async handleFollowingAuthor (authorUsername, followingAuthor) {
@@ -44,6 +46,25 @@ export default class Article extends React.Component {
         followingRequestInFlight: false
       }
     })
+  }
+
+  async handleArticleFavoriting (postAlreadyFavorite) {
+    this.setState({ favoritingRequestInFlight: true })
+    const { slug } = this.props
+    const apiEndpoint = getArticleFovoritingUrl(slug)
+    const requestConfig = {
+      url: apiEndpoint,
+      method: postAlreadyFavorite ? 'delete' : 'post',
+      headers: {
+        Authorization: `Token ${getAuthenticationToken()}`
+      }
+    }
+    const {
+      data: {
+        article
+      }
+    } = await axios(requestConfig)
+    this.setState({ article, favoritingRequestInFlight: false })
   }
 
   async componentDidMount () {
@@ -77,23 +98,25 @@ export default class Article extends React.Component {
 
     const { userLoggedIn } = this.props
 
+    const articleActionsProps = {
+      onFollowingAuthor: this.handleFollowingAuthor,
+      onFavoritingPost: this.handleArticleFavoriting,
+      followingRequestInFlight,
+      userLoggedIn,
+      article
+    }
+
     return (
       <div className='article-page'>
         <ArticleBanner
-          article={article}
-          followingRequestInFlight={followingRequestInFlight}
-          userLoggedIn={userLoggedIn}
-          onFollowingAuthor={this.handleFollowingAuthor}
+          {...articleActionsProps}
         />
         <div className='container page'>
           <ArticleContents />
           <hr />
           <ArticleActions
-            onFollowingAuthor={this.handleFollowingAuthor}
-            followingRequestInFlight={followingRequestInFlight}
-            userLoggedIn={userLoggedIn}
-            article={article}
             centeralize
+            {...articleActionsProps}
           />
           <ArticleComments />
         </div>

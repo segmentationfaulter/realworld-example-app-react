@@ -7,7 +7,7 @@ export default function ArticleActions ({
   onFollowingAuthor,
   followingRequestInFlight,
   onArticleDeletion,
-  onFavoringPost,
+  onFavoritingPost,
   centeralize
 }) {
   if (!article) return null
@@ -65,7 +65,7 @@ export default function ArticleActions ({
     return (
       <button
         className='btn btn-sm btn-outline-primary'
-        onClick={onFavoringPost}
+        onClick={() => onFavoritingPost(favorited)}
       >
         <i className='ion-heart' />
         &nbsp;

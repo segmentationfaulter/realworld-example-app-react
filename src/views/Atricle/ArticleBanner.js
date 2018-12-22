@@ -7,7 +7,8 @@ export default function ArticleBanner ({
   onFollowingAuthor,
   onFavoringPost,
   followingRequestInFlight,
-  userLoggedIn
+  userLoggedIn,
+  onFavoritingPost
 }) {
   if (!article) return null
   return (
@@ -19,6 +20,7 @@ export default function ArticleBanner ({
           article={article}
           followingRequestInFlight={followingRequestInFlight}
           onFollowingAuthor={onFollowingAuthor}
+          onFavoritingPost={onFavoritingPost}
         />
       </div>
     </div>

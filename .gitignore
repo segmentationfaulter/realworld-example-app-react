@@ -77,5 +77,8 @@ typings/
 # Serverless directories
 .serverless
 
+# Todo file
+TODO
+
 
 # End of https://www.gitignore.io/api/node
