@@ -2,7 +2,7 @@ import React from 'react'
 import axios from 'axios'
 
 import ArticleBanner from './ArticleBanner'
-import ArticleContents from './ArticleContents'
+import ArticleBody from './ArticleBody'
 import ArticleActions from './ArticleActions'
 import ArticleComments from './ArticleComments'
 import { getArticlesUrl, getAuthorFollowingUrl, getArticleFovoritingUrl } from '../../urls'
@@ -106,13 +106,15 @@ export default class Article extends React.Component {
       article
     }
 
+    if (!article) return null
+
     return (
       <div className='article-page'>
         <ArticleBanner
           {...articleActionsProps}
         />
         <div className='container page'>
-          <ArticleContents />
+          <ArticleBody body={article.body} />
           <hr />
           <ArticleActions
             centeralize
