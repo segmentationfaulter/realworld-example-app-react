@@ -1,5 +1,6 @@
 import React from 'react'
 import axios from 'axios'
+import invariant from 'invariant'
 import { getAuthenticationHeader } from '../lib/authToken'
 
 export function withAPIConnection (WrappedComponent) {
@@ -21,13 +22,8 @@ export function withAPIConnection (WrappedComponent) {
         data
       } = apiCallOptions
 
-      if (!url) {
-        throw new Error('You need to provide a valid url key in options parameter')
-      }
-
-      if ((method === 'post' || method === 'put') && !data) {
-        throw new Error('You need to provide data in options parameter')
-      }
+      invariant(!url, 'You need to provide a valid url key in options parameter')
+      invariant((method === 'post' || method === 'put') && !data, 'You need to provide data in options parameter')
 
       this.setState({ apiCallInFlight: true })
 
