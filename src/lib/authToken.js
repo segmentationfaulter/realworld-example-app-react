@@ -7,3 +7,9 @@ export function setAuthenticationToken (token) {
 export function getAuthenticationToken () {
   return window.localStorage.getItem(AUTH_TOEKN_FIELD_NAME)
 }
+
+export function getAuthenticationHeader () {
+  return {
+    Authorization: `Token ${getAuthenticationToken()}`
+  }
+}

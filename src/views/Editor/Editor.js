@@ -2,7 +2,7 @@ import React from 'react'
 import axios from 'axios'
 
 import { getArticlesUrl } from '../../urls'
-import { getAuthenticationToken } from '../../lib/authToken'
+import { getAuthenticationHeader } from '../../lib/authToken'
 
 export default class Editor extends React.Component {
   constructor (props) {
@@ -44,7 +44,7 @@ export default class Editor extends React.Component {
       url: getArticlesUrl(),
       data: requestBody,
       headers: {
-        'Authorization': `Token ${getAuthenticationToken()}`
+        ...getAuthenticationHeader()
       }
     }
 

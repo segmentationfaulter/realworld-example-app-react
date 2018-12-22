@@ -6,7 +6,7 @@ import ArticleBody from './ArticleBody'
 import ArticleActions from './ArticleActions'
 import ArticleComments from './ArticleComments'
 import { getArticlesUrl, getAuthorFollowingUrl, getArticleFovoritingUrl, getArticleCommentsUrl } from '../../urls'
-import { getAuthenticationToken } from '../../lib/authToken'
+import { getAuthenticationToken, getAuthenticationHeader } from '../../lib/authToken'
 
 export default class Article extends React.Component {
   constructor (props) {
@@ -30,7 +30,7 @@ export default class Article extends React.Component {
       url: apiEndpoint,
       method: followingAuthor ? 'delete' : 'post',
       headers: {
-        Authorization: `Token ${getAuthenticationToken()}`
+        ...getAuthenticationHeader()
       }
     }
 
@@ -57,7 +57,7 @@ export default class Article extends React.Component {
       url: apiEndpoint,
       method: postAlreadyFavorite ? 'delete' : 'post',
       headers: {
-        Authorization: `Token ${getAuthenticationToken()}`
+        ...getAuthenticationHeader()
       }
     }
     const {
@@ -81,7 +81,7 @@ export default class Article extends React.Component {
     const authToken = getAuthenticationToken()
     if (authToken) {
       requestConfig.headers = {
-        Authorization: `Token ${authToken}`
+        ...getAuthenticationHeader()
       }
     }
     const articlePromise = axios.get(articleUrl, requestConfig)
@@ -131,6 +131,7 @@ export default class Article extends React.Component {
           />
           <ArticleComments
             comments={comments}
+            userLoggedIn={userLoggedIn}
           />
         </div>
       </div>
