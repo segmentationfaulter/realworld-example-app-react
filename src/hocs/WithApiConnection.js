@@ -22,8 +22,8 @@ export function withAPIConnection (WrappedComponent) {
         data
       } = apiCallOptions
 
-      invariant(!url, 'You need to provide a valid url key in options parameter')
-      invariant((method === 'post' || method === 'put') && !data, 'You need to provide data in options parameter')
+      invariant(url, 'You need to provide a valid url key in options parameter')
+      invariant((method === 'post' || method === 'put') && data, 'You need to provide data in options parameter')
 
       this.setState({ apiCallInFlight: true })
 

@@ -19,6 +19,7 @@ class ArticleCommentEditor extends Component {
 
   handleSubmit (e) {
     e.preventDefault()
+    this.setState({ comment: '' })
     const apiCallOptions = {
       data: {
         comment: {
@@ -28,7 +29,7 @@ class ArticleCommentEditor extends Component {
       url: getArticleCommentsUrl(this.props.slug),
       method: 'post'
     }
-    this.props.handleApiCall(apiCallOptions)
+    this.props.handleApiCall(apiCallOptions, () => this.props.refreshData())
   }
 
   render () {

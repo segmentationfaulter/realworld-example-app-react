@@ -20,6 +20,7 @@ export default class Article extends React.Component {
 
     this.handleFollowingAuthor = this.handleFollowingAuthor.bind(this)
     this.handleArticleFavoriting = this.handleArticleFavoriting.bind(this)
+    this.fetchData = this.fetchData.bind(this)
   }
 
   async handleFollowingAuthor (authorUsername, followingAuthor) {
@@ -69,11 +70,10 @@ export default class Article extends React.Component {
   }
 
   async componentDidMount () {
-    const { article, comments } = await this.fetchArticle()
-    this.setState({ article, comments })
+    await this.fetchData()
   }
 
-  async fetchArticle () {
+  async fetchData () {
     const { slug } = this.props
     const articleUrl = getArticlesUrl(slug)
     const commentsUrl = getArticleCommentsUrl(slug)
@@ -89,11 +89,7 @@ export default class Article extends React.Component {
 
     const { data: { article } } = await articlePromise
     const { data: { comments } } = await commentsPromise
-
-    return {
-      article,
-      comments
-    }
+    this.setState({ article, comments })
   }
 
   render () {
@@ -133,6 +129,7 @@ export default class Article extends React.Component {
             comments={comments}
             userLoggedIn={userLoggedIn}
             slug={slug}
+            refreshData={this.fetchData}
           />
         </div>
       </div>
