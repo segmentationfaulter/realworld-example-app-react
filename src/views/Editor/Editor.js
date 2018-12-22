@@ -1,18 +1,16 @@
 import React from 'react'
-import axios from 'axios'
 
+import { withAPIConnection } from '../../hocs/WithApiConnection'
 import { getArticlesUrl } from '../../urls'
-import { getAuthenticationHeader } from '../../lib/authToken'
 
-export default class Editor extends React.Component {
+class Editor extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       title: '',
       description: '',
       body: '',
-      tags: '',
-      apiRequestInFlight: false
+      tags: ''
     }
 
     this.handleFormChange = this.handleFormChange.bind(this)
@@ -21,7 +19,6 @@ export default class Editor extends React.Component {
 
   async handleFormSubmission (submissionEvent) {
     submissionEvent.preventDefault()
-    this.setState({ apiRequestInFlight: true })
 
     const {
       title,
@@ -39,21 +36,12 @@ export default class Editor extends React.Component {
       }
     }
 
-    const requestConfig = {
+    const options = {
       method: 'post',
       url: getArticlesUrl(),
-      data: requestBody,
-      headers: {
-        ...getAuthenticationHeader()
-      }
+      data: requestBody
     }
-
-    try {
-      const { data } = await axios(requestConfig)
-      await this.props.navigate(`/article/${data.article.slug}`)
-    } catch (err) {
-      this.setState({ apiRequestInFlight: false })
-    }
+    await this.props.handleApiCall(options, () => this.props.navigate(`/article/${this.props.apiResponse.article.slug}`))
   }
 
   handleFormChange (changeEvent) {
@@ -74,8 +62,7 @@ export default class Editor extends React.Component {
       title,
       description,
       body,
-      tags,
-      apiRequestInFlight
+      tags
     } = this.state
 
     return (
@@ -88,7 +75,7 @@ export default class Editor extends React.Component {
                 description={description}
                 body={body}
                 tags={tags}
-                apiRequestInFlight={apiRequestInFlight}
+                apiCallInFlight={this.props.apiCallInFlight}
                 onChange={this.handleFormChange}
                 onSubmit={this.handleFormSubmission}
               />
@@ -100,7 +87,7 @@ export default class Editor extends React.Component {
   }
 }
 
-function Form ({ title, description, body, tags, onChange, onSubmit, apiRequestInFlight }) {
+function Form ({ title, description, body, tags, onChange, onSubmit, apiCallInFlight }) {
   return (
     <form
       onChange={onChange}
@@ -149,7 +136,7 @@ function Form ({ title, description, body, tags, onChange, onSubmit, apiRequestI
         </fieldset>
         <button
           className='btn btn-lg pull-xs-right btn-primary'
-          disabled={apiRequestInFlight}
+          disabled={apiCallInFlight}
           type='submit'
         >
           Publish Article
@@ -158,6 +145,9 @@ function Form ({ title, description, body, tags, onChange, onSubmit, apiRequestI
     </form>
   )
 }
+
 function normalizeTags (tags) {
   return tags.split(',').map((tag) => tag.trim())
 }
+
+export default withAPIConnection(Editor)

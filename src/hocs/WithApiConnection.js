@@ -36,8 +36,13 @@ export function withAPIConnection (WrappedComponent) {
         }
       }
 
-      const { data: response } = await axios(requestConfig)
-      this.setState({ apiCallInFlight: false, apiResponse: response }, () => callback && callback(this.state.apiResponse))
+      try {
+        const { data: response } = await axios(requestConfig)
+        this.setState({ apiCallInFlight: false, apiResponse: response }, () => callback && callback(this.state.apiResponse))
+      } catch (err) {
+        this.setState({ apiCallInFlight: false })
+        throw err
+      }
     }
 
     render () {

@@ -22,7 +22,7 @@ function CommentsList ({ comments }) {
   return (
     <React.Fragment>
       {comments.map((comment) => (
-        <div className='card'>
+        <div className='card' key={comment.id.toString()}>
           <div className='card-block'>
             <p className='card-text'>
               {comment.body}
