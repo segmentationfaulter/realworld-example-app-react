@@ -5,7 +5,7 @@ import ArticleBanner from './ArticleBanner'
 import ArticleBody from './ArticleBody'
 import ArticleActions from './ArticleActions'
 import ArticleComments from './ArticleComments'
-import { getArticlesUrl, getAuthorFollowingUrl, getArticleFovoritingUrl } from '../../urls'
+import { getArticlesUrl, getAuthorFollowingUrl, getArticleFovoritingUrl, getArticleCommentsUrl } from '../../urls'
 import { getAuthenticationToken } from '../../lib/authToken'
 
 export default class Article extends React.Component {
@@ -13,6 +13,7 @@ export default class Article extends React.Component {
     super(props)
     this.state = {
       article: null,
+      comments: null,
       followingRequestInFlight: false,
       favoritingRequestInFlight: false
     }
@@ -68,13 +69,14 @@ export default class Article extends React.Component {
   }
 
   async componentDidMount () {
-    const article = await this.fetchArticle()
-    this.setState({ article })
+    const { article, comments } = await this.fetchArticle()
+    this.setState({ article, comments })
   }
 
   async fetchArticle () {
     const { slug } = this.props
-    const apiEndpoint = getArticlesUrl(slug)
+    const articleUrl = getArticlesUrl(slug)
+    const commentsUrl = getArticleCommentsUrl(slug)
     const requestConfig = {}
     const authToken = getAuthenticationToken()
     if (authToken) {
@@ -82,18 +84,24 @@ export default class Article extends React.Component {
         Authorization: `Token ${authToken}`
       }
     }
-    const {
-      data: {
-        article
-      }
-    } = await axios.get(apiEndpoint, requestConfig)
-    return article
+    const articlePromise = axios.get(articleUrl, requestConfig)
+    const commentsPromise = axios.get(commentsUrl, requestConfig)
+
+    const { data: { article } } = await articlePromise
+    const { data: { comments } } = await commentsPromise
+
+    return {
+      article,
+      comments
+    }
   }
 
   render () {
     const {
       article,
-      followingRequestInFlight
+      followingRequestInFlight,
+      favoritingRequestInFlight,
+      comments
     } = this.state
 
     const { userLoggedIn } = this.props
@@ -102,11 +110,12 @@ export default class Article extends React.Component {
       onFollowingAuthor: this.handleFollowingAuthor,
       onFavoritingPost: this.handleArticleFavoriting,
       followingRequestInFlight,
+      favoritingRequestInFlight,
       userLoggedIn,
       article
     }
 
-    if (!article) return null
+    if (!article || !comments) return null
 
     return (
       <div className='article-page'>
@@ -120,7 +129,9 @@ export default class Article extends React.Component {
             centeralize
             {...articleActionsProps}
           />
-          <ArticleComments />
+          <ArticleComments
+            comments={comments}
+          />
         </div>
       </div>
     )

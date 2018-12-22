@@ -7,6 +7,7 @@ export default function ArticleBanner ({
   onFollowingAuthor,
   onFavoringPost,
   followingRequestInFlight,
+  favoritingRequestInFlight,
   userLoggedIn,
   onFavoritingPost
 }) {
@@ -19,6 +20,7 @@ export default function ArticleBanner ({
           userLoggedIn={userLoggedIn}
           article={article}
           followingRequestInFlight={followingRequestInFlight}
+          favoritingRequestInFlight={favoritingRequestInFlight}
           onFollowingAuthor={onFollowingAuthor}
           onFavoritingPost={onFavoritingPost}
         />

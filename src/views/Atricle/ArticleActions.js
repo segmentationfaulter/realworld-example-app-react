@@ -6,6 +6,7 @@ export default function ArticleActions ({
   article,
   onFollowingAuthor,
   followingRequestInFlight,
+  favoritingRequestInFlight,
   onArticleDeletion,
   onFavoritingPost,
   centeralize
@@ -66,6 +67,7 @@ export default function ArticleActions ({
       <button
         className='btn btn-sm btn-outline-primary'
         onClick={() => onFavoritingPost(favorited)}
+        disabled={favoritingRequestInFlight}
       >
         <i className='ion-heart' />
         &nbsp;
