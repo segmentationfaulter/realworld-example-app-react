@@ -104,7 +104,7 @@ export default class Article extends React.Component {
       comments
     } = this.state
 
-    const { userLoggedIn } = this.props
+    const { userLoggedIn, slug } = this.props
 
     const articleActionsProps = {
       onFollowingAuthor: this.handleFollowingAuthor,
@@ -132,6 +132,7 @@ export default class Article extends React.Component {
           <ArticleComments
             comments={comments}
             userLoggedIn={userLoggedIn}
+            slug={slug}
           />
         </div>
       </div>
