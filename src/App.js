@@ -8,8 +8,10 @@ import { getAuthenticationToken } from './lib/authToken'
 import RegistrationForm from './views/RegistrationForm'
 import LoginForm from './views/LoginForm'
 import Home from './views/Home'
+import Header from './views/Header'
+import Footer from './views/Footer'
 import Editor from './views/Editor'
-import Article from './views/Atricle/Article';
+import Article from './views/Atricle/Article'
 
 export default class App extends React.Component {
   constructor (props) {
@@ -18,6 +20,11 @@ export default class App extends React.Component {
       userLoggedIn: null,
       userResolved: false
     }
+    this.setUser = this.setUser.bind(this)
+  }
+
+  setUser (user) {
+    this.setState({ userLoggedIn: user })
   }
 
   async componentDidMount () {
@@ -57,13 +64,15 @@ export default class App extends React.Component {
 
     return (
       <div>
+        <Header userLoggedIn={userLoggedIn} />
         <Router>
           <Home path='/' />
-          <RegistrationForm path='/register' />
-          <LoginForm path='/login' />
+          <RegistrationForm path='/register' setUser={this.setUser} />
+          <LoginForm path='/login' setUser={this.setUser} />
           <Editor path='/editor/:slug' />
           <Article path='/article/:slug' userLoggedIn={userLoggedIn} />
         </Router>
+        <Footer />
       </div>
     )
   }

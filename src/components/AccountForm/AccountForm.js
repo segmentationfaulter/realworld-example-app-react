@@ -22,7 +22,7 @@ export default class AccountForm extends React.Component {
   async handleFormSubmission (submissionEvent) {
     submissionEvent.preventDefault()
     this.setState({ apiRequestInFlight: true })
-    const { loginOnly } = this.props
+    const { loginOnly, setUser } = this.props
     const { email, password, username } = this.state
 
     const requestBody = {
@@ -44,6 +44,8 @@ export default class AccountForm extends React.Component {
     try {
       var { data: response } = await axios(requestConfig)
       setAuthenticationToken(response.user.token)
+      delete response.user.token
+      setUser(response.user)
       this.props.navigate('/')
     } catch (err) {
       if (err.response) {

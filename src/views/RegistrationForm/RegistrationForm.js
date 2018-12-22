@@ -1,8 +1,8 @@
 import React from 'react'
 import AccountFrom from '../../components/AccountForm'
 
-export default function RegistrationForm ({ navigate }) {
+export default function RegistrationForm ({ navigate, setUser }) {
   return (
-    <AccountFrom navigate={navigate} />
+    <AccountFrom navigate={navigate} setUser={setUser} />
   )
 }
