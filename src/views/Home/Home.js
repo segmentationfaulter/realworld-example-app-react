@@ -1,11 +1,11 @@
 import React from 'react'
 import axios from 'axios'
 import cn from 'classnames'
-import { getArticlesUrl, getFeedArticlesUrl } from '../../urls'
+import { getArticlesUrl, getFeedArticlesUrl, getTagsListUrl } from '../../urls'
 import { getAuthenticationHeader } from '../../lib/authToken'
 import ArticlesPreview from './ArticlesPreview'
 
-const FEEDS = {
+const DEFAULT_FEEDS = {
   global: 'global',
   personal: 'personal'
 }
@@ -14,71 +14,81 @@ export default class Home extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      globalFeed: null,
-      personalFeed: null,
-      articlesFetched: false,
-      selectedFeed: FEEDS.global
+      tags: [],
+      feeds: [
+        { label: 'My Feed', id: DEFAULT_FEEDS.personal, articles: null },
+        { label: 'Global Feed', id: DEFAULT_FEEDS.global, articles: null }
+      ],
+      selectedFeedId: 'global'
     }
 
     this.handleFeedChange = this.handleFeedChange.bind(this)
   }
 
-  async fetchPersonalFeedArticles () {
-    if (!this.props.userLoggedIn) {
-      return
+  async fetchSelectedFeedArticles () {
+    const { selectedFeedId } = this.state
+    const requestConfig = {}
+    let url
+
+    if (selectedFeedId === DEFAULT_FEEDS.global) {
+      url = getArticlesUrl()
+    } else if (selectedFeedId === DEFAULT_FEEDS.personal) {
+      url = getFeedArticlesUrl()
+      requestConfig.headers = { ...getAuthenticationHeader() }
+    } else {
+      url = getArticlesUrl(undefined, `tag=${selectedFeedId}`)
     }
 
-    const requestConfig = {
-      headers: { ...getAuthenticationHeader() }
-    }
-    const { data: {
-      articles: personalFeed
-    } } = await axios.get(getFeedArticlesUrl(), requestConfig)
-    this.setState({ personalFeed })
+    const { data: { articles } } = await axios.get(url, requestConfig)
+
+    this.setState((prevState) => {
+      const targetFeedIndex = prevState.feeds.findIndex((feed) => feed.id === selectedFeedId)
+      prevState.feeds[targetFeedIndex].articles = articles
+      return {
+        feed: prevState.feeds
+      }
+    })
   }
 
-  async fetchGlobalFeedArticles () {
-    const { data: {
-      articles: globalFeed
-    } } = await axios.get(getArticlesUrl())
-    this.setState({ globalFeed })
-  }
-
-  async fetchArticles () {
-    await Promise.all([this.fetchPersonalFeedArticles(), this.fetchGlobalFeedArticles()])
-    this.setState({ articlesFetched: true })
+  async fetchTagsList () {
+    const {
+      data: { tags }
+    } = await axios.get(getTagsListUrl())
+    this.setState({ tags })
   }
 
   renderArticlePreviews () {
     const {
-      selectedFeed,
-      articlesFetched,
-      globalFeed,
-      personalFeed
+      selectedFeedId,
+      feeds
     } = this.state
 
-    if (!articlesFetched) {
+    const [{ articles }] = feeds.filter(feed => feed.id === selectedFeedId)
+
+    if (articles === null) {
       return <div className='article-preview'>Loading...</div>
     }
+
     return (
       <ArticlesPreview
-        articles={selectedFeed === FEEDS.global ? globalFeed : personalFeed}
+        articles={articles}
       />
     )
   }
 
-  handleFeedChange (e, feed) {
+  handleFeedChange (e, selectedFeedId) {
     e.preventDefault()
-    if (!this.props.userLoggedIn && feed === FEEDS.personal) return
-    this.setState({ selectedFeed: feed })
+    if (!this.props.userLoggedIn && selectedFeedId === 'personal') return
+    this.setState({ selectedFeedId })
   }
 
-  async componentDidMount () {
-    await this.fetchArticles()
+  componentDidMount () {
+    this.fetchSelectedFeedArticles()
+    this.fetchTagsList()
   }
 
   render () {
-    const { selectedFeed } = this.state
+    const { selectedFeedId, tags, feeds } = this.state
 
     const { userLoggedIn } = this.props
 
@@ -89,14 +99,15 @@ export default class Home extends React.Component {
           <div className='row'>
             <div className='col-md-9'>
               <FeedToggle
+                feeds={feeds}
                 onFeedChange={this.handleFeedChange}
-                selectedFeed={selectedFeed}
+                selectedFeedId={selectedFeedId}
                 userLoggedIn={userLoggedIn}
               />
               {this.renderArticlePreviews()}
             </div>
             <div className='col-md-3'>
-              <Sidebar />
+              <Sidebar tags={tags} />
             </div>
           </div>
         </div>
@@ -116,62 +127,44 @@ function Banner () {
   )
 }
 
-function FeedToggle ({ onFeedChange, selectedFeed, userLoggedIn }) {
+function FeedToggle ({ feeds, onFeedChange, selectedFeedId, userLoggedIn }) {
   const getClasses = currentFeed =>
     cn(
       'nav-link',
-      { active: currentFeed === selectedFeed },
-      { disabled: !userLoggedIn && currentFeed === FEEDS.personal }
+      { active: currentFeed.id === selectedFeedId },
+      { disabled: !userLoggedIn && (currentFeed.id === 'personal') }
     )
 
   return (
     <div className='feed-toggle'>
       <ul className='nav nav-pills outline-active'>
-        <li className='nav-item' onClick={e => onFeedChange(e, FEEDS.personal)}>
-          <a className={getClasses(FEEDS.personal)} href=''>
-            Your Feed
-          </a>
-        </li>
-        <li className='nav-item' onClick={e => onFeedChange(e, FEEDS.global)}>
-          <a className={getClasses(FEEDS.global)} href=''>
-            Global Feed
-          </a>
-        </li>
+        {feeds.map(feed => (
+          <li
+            className='nav-item'
+            onClick={e => onFeedChange(e, feed)}
+            key={feed.id}
+          >
+            <a className={getClasses(feed)} href=''>
+              {feed.label}
+            </a>
+          </li>
+        ))}
       </ul>
     </div>
   )
 }
 
-function Sidebar () {
+function Sidebar ({ tags }) {
   return (
     <div className='sidebar'>
       <p>Popular Tags</p>
 
       <div className='tag-list'>
-        <a href='' className='tag-pill tag-default'>
-          programming
-        </a>
-        <a href='' className='tag-pill tag-default'>
-          javascript
-        </a>
-        <a href='' className='tag-pill tag-default'>
-          emberjs
-        </a>
-        <a href='' className='tag-pill tag-default'>
-          angularjs
-        </a>
-        <a href='' className='tag-pill tag-default'>
-          react
-        </a>
-        <a href='' className='tag-pill tag-default'>
-          mean
-        </a>
-        <a href='' className='tag-pill tag-default'>
-          node
-        </a>
-        <a href='' className='tag-pill tag-default'>
-          rails
-        </a>
+        {tags.map(tag => (
+          <a href='' className='tag-pill tag-default' key={tag}>
+            {tag}
+          </a>
+        ))}
       </div>
     </div>
   )
