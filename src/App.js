@@ -66,7 +66,7 @@ export default class App extends React.Component {
       <div>
         <Header userLoggedIn={userLoggedIn} />
         <Router>
-          <Home path='/' />
+          <Home path='/' userLoggedIn={userLoggedIn} />
           <RegistrationForm path='/register' setUser={this.setUser} />
           <LoginForm path='/login' setUser={this.setUser} />
           <Editor path='/editor/:slug' />

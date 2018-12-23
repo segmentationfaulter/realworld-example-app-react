@@ -57,6 +57,7 @@ export default class Home extends React.Component {
 
   handleFeedChange (e, feed) {
     e.preventDefault()
+    if (!this.props.userLoggedIn && feed === FEEDS.personal) return
     this.setState({ selectedFeed: feed })
   }
 
@@ -66,11 +67,11 @@ export default class Home extends React.Component {
 
   render () {
     const {
-      articlesFetched,
-      globalFeed,
-      personalFeed,
       selectedFeed
     } = this.state
+
+    const { userLoggedIn } = this.props
+
     return (
       <div className='home-page'>
         <Banner />
@@ -80,6 +81,7 @@ export default class Home extends React.Component {
               <FeedToggle
                 onFeedChange={this.handleFeedChange}
                 selectedFeed={selectedFeed}
+                userLoggedIn={userLoggedIn}
               />
               {this.renderArticlePreviews()}
             </div>
@@ -104,8 +106,12 @@ function Banner () {
   )
 }
 
-function FeedToggle ({ onFeedChange, selectedFeed }) {
-  const getClasses = (currentFeed) => cn('nav-link', { 'active': currentFeed === selectedFeed })
+function FeedToggle ({ onFeedChange, selectedFeed, userLoggedIn }) {
+  const getClasses = (currentFeed) => cn('nav-link',
+    { 'active': currentFeed === selectedFeed },
+    { 'disabled': !userLoggedIn && (currentFeed === FEEDS.personal) }
+  )
+
   return (
     <div className='feed-toggle'>
       <ul className='nav nav-pills outline-active'>
