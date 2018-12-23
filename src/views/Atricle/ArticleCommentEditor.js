@@ -1,13 +1,15 @@
 import React, { Component } from 'react'
+import axios from 'axios'
 
-import { withAPIConnection } from '../../hocs/WithApiConnection'
 import { getArticleCommentsUrl } from '../../urls'
+import { getAuthenticationHeader } from '../../lib/authToken'
 
-class ArticleCommentEditor extends Component {
+export default class ArticleCommentEditor extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      comment: ''
+      comment: '',
+      apiCallInFlight: false
     }
     this.handleSubmit = this.handleSubmit.bind(this)
     this.handleChange = this.handleChange.bind(this)
@@ -17,9 +19,9 @@ class ArticleCommentEditor extends Component {
     this.setState({ comment: e.target.value })
   }
 
-  handleSubmit (e) {
+  async handleSubmit (e) {
     e.preventDefault()
-    this.setState({ comment: '' })
+    this.setState({ apiCallInFlight: true })
     const apiCallOptions = {
       data: {
         comment: {
@@ -27,19 +29,23 @@ class ArticleCommentEditor extends Component {
         }
       },
       url: getArticleCommentsUrl(this.props.slug),
-      method: 'post'
+      method: 'post',
+      headers: { ...getAuthenticationHeader() }
     }
-    this.props.handleApiCall(apiCallOptions, () => this.props.refreshData())
+
+    await axios(apiCallOptions)
+    this.setState({ apiCallInFlight: false, comment: '' })
+    this.props.refreshData()
   }
 
   render () {
     const {
-      userLoggedIn,
-      apiCallInFlight
+      userLoggedIn
     } = this.props
 
     const {
-      comment
+      comment,
+      apiCallInFlight
     } = this.state
 
     return (
@@ -69,5 +75,3 @@ class ArticleCommentEditor extends Component {
     )
   }
 }
-
-export default withAPIConnection(ArticleCommentEditor)
