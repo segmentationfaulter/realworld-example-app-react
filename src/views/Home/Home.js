@@ -87,6 +87,14 @@ export default class Home extends React.Component {
     this.fetchTagsList()
   }
 
+  componentDidUpdate (prevProps, prevState) {
+    if (this.state.selectedFeedId !== prevState.selectedFeedId) {
+      const [selectedFeed] = prevState.feeds.filter((feed) => feed.id === this.state.selectedFeedId)
+      if (selectedFeed.articles) return
+      this.fetchSelectedFeedArticles()
+    }
+  }
+
   render () {
     const { selectedFeedId, tags, feeds } = this.state
 
@@ -141,7 +149,7 @@ function FeedToggle ({ feeds, onFeedChange, selectedFeedId, userLoggedIn }) {
         {feeds.map(feed => (
           <li
             className='nav-item'
-            onClick={e => onFeedChange(e, feed)}
+            onClick={e => onFeedChange(e, feed.id)}
             key={feed.id}
           >
             <a className={getClasses(feed)} href=''>
