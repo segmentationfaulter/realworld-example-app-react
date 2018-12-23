@@ -1,52 +1,87 @@
 import React from 'react'
 import axios from 'axios'
-import { getArticlesUrl } from '../../urls'
+import cn from 'classnames'
+import { getArticlesUrl, getFeedArticlesUrl } from '../../urls'
 import { getAuthenticationHeader } from '../../lib/authToken'
 import ArticlesPreview from './ArticlesPreview'
+
+const FEEDS = {
+  global: 'global',
+  personal: 'personal'
+}
 
 export default class Home extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       globalFeed: null,
-      globalFeedFetched: false
+      personalFeed: null,
+      articlesFetched: false,
+      selectedFeed: FEEDS.global
     }
+
+    this.handleFeedChange = this.handleFeedChange.bind(this)
   }
 
-  async fetchGlobalFeedArticles () {
-    const { data: { articles } } = await axios.get(getArticlesUrl())
-    this.setState({ globalFeed: articles, globalFeedFetched: true })
+  async fetchArticles () {
+    const globalFeedPromise = axios.get(getArticlesUrl())
+    const personalFeedPromise = axios.get(getFeedArticlesUrl(), {
+      headers: { ...getAuthenticationHeader() }
+    })
+    const { data: {
+      articles: globalFeed
+    } } = await globalFeedPromise
+    const { data: {
+      articles: personalFeed
+    } } = await personalFeedPromise
+    this.setState({ globalFeed, personalFeed, articlesFetched: true })
   }
 
-  renderGlobalFeed () {
+  renderArticlePreviews () {
     const {
+      selectedFeed,
+      articlesFetched,
       globalFeed,
-      globalFeedFetched
+      personalFeed
     } = this.state
 
-    if (!globalFeedFetched) {
+    if (!articlesFetched) {
       return <div className='article-preview'>Loading...</div>
     }
     return (
       <ArticlesPreview
-        articles={globalFeed}
+        articles={selectedFeed === FEEDS.global ? globalFeed : personalFeed}
       />
     )
   }
 
+  handleFeedChange (e, feed) {
+    e.preventDefault()
+    this.setState({ selectedFeed: feed })
+  }
+
   async componentDidMount () {
-    await this.fetchGlobalFeedArticles()
+    await this.fetchArticles()
   }
 
   render () {
+    const {
+      articlesFetched,
+      globalFeed,
+      personalFeed,
+      selectedFeed
+    } = this.state
     return (
       <div className='home-page'>
         <Banner />
         <div className='container page'>
           <div className='row'>
             <div className='col-md-9'>
-              <FeedToggle />
-              {this.renderGlobalFeed()}
+              <FeedToggle
+                onFeedChange={this.handleFeedChange}
+                selectedFeed={selectedFeed}
+              />
+              {this.renderArticlePreviews()}
             </div>
             <div className='col-md-3'>
               <Sidebar />
@@ -69,17 +104,18 @@ function Banner () {
   )
 }
 
-function FeedToggle () {
+function FeedToggle ({ onFeedChange, selectedFeed }) {
+  const getClasses = (currentFeed) => cn('nav-link', { 'active': currentFeed === selectedFeed })
   return (
     <div className='feed-toggle'>
       <ul className='nav nav-pills outline-active'>
-        <li className='nav-item'>
-          <a className='nav-link disabled' href=''>
+        <li className='nav-item' onClick={(e) => onFeedChange(e, FEEDS.personal)}>
+          <a className={getClasses(FEEDS.personal)} href=''>
             Your Feed
           </a>
         </li>
-        <li className='nav-item'>
-          <a className='nav-link active' href=''>
+        <li className='nav-item' onClick={(e) => onFeedChange(e, FEEDS.global)}>
+          <a className={getClasses(FEEDS.global)} href=''>
             Global Feed
           </a>
         </li>
