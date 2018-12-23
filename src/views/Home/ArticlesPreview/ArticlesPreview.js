@@ -3,6 +3,7 @@ import { Link } from '@reach/router'
 
 const ArticlesPreview = ({ articles }) => {
   const getProfileUrl = (article) => `/profile/${article.author.username}`
+  if (!articles) return null
   if (!articles.length) {
     return <div className='article-preview'>No articles found</div>
   }

@@ -23,18 +23,30 @@ export default class Home extends React.Component {
     this.handleFeedChange = this.handleFeedChange.bind(this)
   }
 
-  async fetchArticles () {
-    const globalFeedPromise = axios.get(getArticlesUrl())
-    const personalFeedPromise = axios.get(getFeedArticlesUrl(), {
+  async fetchPersonalFeedArticles () {
+    if (!this.props.userLoggedIn) {
+      return
+    }
+
+    const requestConfig = {
       headers: { ...getAuthenticationHeader() }
-    })
-    const { data: {
-      articles: globalFeed
-    } } = await globalFeedPromise
+    }
     const { data: {
       articles: personalFeed
-    } } = await personalFeedPromise
-    this.setState({ globalFeed, personalFeed, articlesFetched: true })
+    } } = await axios.get(getFeedArticlesUrl(), requestConfig)
+    this.setState({ personalFeed })
+  }
+
+  async fetchGlobalFeedArticles () {
+    const { data: {
+      articles: globalFeed
+    } } = await axios.get(getArticlesUrl())
+    this.setState({ globalFeed })
+  }
+
+  async fetchArticles () {
+    await Promise.all([this.fetchPersonalFeedArticles(), this.fetchGlobalFeedArticles()])
+    this.setState({ articlesFetched: true })
   }
 
   renderArticlePreviews () {
@@ -66,9 +78,7 @@ export default class Home extends React.Component {
   }
 
   render () {
-    const {
-      selectedFeed
-    } = this.state
+    const { selectedFeed } = this.state
 
     const { userLoggedIn } = this.props
 
@@ -107,20 +117,22 @@ function Banner () {
 }
 
 function FeedToggle ({ onFeedChange, selectedFeed, userLoggedIn }) {
-  const getClasses = (currentFeed) => cn('nav-link',
-    { 'active': currentFeed === selectedFeed },
-    { 'disabled': !userLoggedIn && (currentFeed === FEEDS.personal) }
-  )
+  const getClasses = currentFeed =>
+    cn(
+      'nav-link',
+      { active: currentFeed === selectedFeed },
+      { disabled: !userLoggedIn && currentFeed === FEEDS.personal }
+    )
 
   return (
     <div className='feed-toggle'>
       <ul className='nav nav-pills outline-active'>
-        <li className='nav-item' onClick={(e) => onFeedChange(e, FEEDS.personal)}>
+        <li className='nav-item' onClick={e => onFeedChange(e, FEEDS.personal)}>
           <a className={getClasses(FEEDS.personal)} href=''>
             Your Feed
           </a>
         </li>
-        <li className='nav-item' onClick={(e) => onFeedChange(e, FEEDS.global)}>
+        <li className='nav-item' onClick={e => onFeedChange(e, FEEDS.global)}>
           <a className={getClasses(FEEDS.global)} href=''>
             Global Feed
           </a>
