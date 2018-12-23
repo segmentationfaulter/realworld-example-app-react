@@ -23,6 +23,7 @@ export default class Home extends React.Component {
     }
 
     this.handleFeedChange = this.handleFeedChange.bind(this)
+    this.handleTagClick = this.handleTagClick.bind(this)
   }
 
   async fetchSelectedFeedArticles () {
@@ -45,8 +46,22 @@ export default class Home extends React.Component {
       const targetFeedIndex = prevState.feeds.findIndex((feed) => feed.id === selectedFeedId)
       prevState.feeds[targetFeedIndex].articles = articles
       return {
-        feed: prevState.feeds
+        feeds: prevState.feeds
       }
+    })
+  }
+
+  handleTagClick (e, tag) {
+    e.preventDefault()
+    const tagFeed = {
+      label: `#${tag}`,
+      id: tag,
+      articles: null
+    }
+
+    this.setState({
+      feeds: this.state.feeds.concat([tagFeed]),
+      selectedFeedId: tag
     })
   }
 
@@ -89,7 +104,7 @@ export default class Home extends React.Component {
 
   componentDidUpdate (prevProps, prevState) {
     if (this.state.selectedFeedId !== prevState.selectedFeedId) {
-      const [selectedFeed] = prevState.feeds.filter((feed) => feed.id === this.state.selectedFeedId)
+      const [selectedFeed] = this.state.feeds.filter((feed) => feed.id === this.state.selectedFeedId)
       if (selectedFeed.articles) return
       this.fetchSelectedFeedArticles()
     }
@@ -115,7 +130,7 @@ export default class Home extends React.Component {
               {this.renderArticlePreviews()}
             </div>
             <div className='col-md-3'>
-              <Sidebar tags={tags} />
+              <Sidebar tags={tags} onTagClick={this.handleTagClick} />
             </div>
           </div>
         </div>
@@ -162,14 +177,14 @@ function FeedToggle ({ feeds, onFeedChange, selectedFeedId, userLoggedIn }) {
   )
 }
 
-function Sidebar ({ tags }) {
+function Sidebar ({ tags, onTagClick }) {
   return (
     <div className='sidebar'>
       <p>Popular Tags</p>
 
       <div className='tag-list'>
         {tags.map(tag => (
-          <a href='' className='tag-pill tag-default' key={tag}>
+          <a href='' className='tag-pill tag-default' key={tag} onClick={(e) => onTagClick(e, tag)}>
             {tag}
           </a>
         ))}
