@@ -10,5 +10,5 @@ export const getArticleCommentsUrl = (slug) => `${API_ENDPOINT_BASE}/articles/${
 export const getTagsListUrl = () => `${API_ENDPOINT_BASE}/tags`
 export const getArticlesUrl = (slug, queryParameters = '') => {
   if (slug) return `${API_ENDPOINT_BASE}/articles/${slug}`
-  return `${API_ENDPOINT_BASE}/articles?${queryParameters}`
+  return `${API_ENDPOINT_BASE}/articles${'?' + queryParameters}`
 }

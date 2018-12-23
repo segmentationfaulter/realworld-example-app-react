@@ -1,16 +1,18 @@
 import React from 'react'
+import axios from 'axios'
 
-import { withAPIConnection } from '../../hocs/WithApiConnection'
 import { getArticlesUrl } from '../../urls'
+import { getAuthenticationHeader } from '../../lib/authToken'
 
-class Editor extends React.Component {
+export default class Editor extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       title: '',
       description: '',
       body: '',
-      tags: ''
+      tags: '',
+      apiCallInFlight: false
     }
 
     this.handleFormChange = this.handleFormChange.bind(this)
@@ -19,6 +21,7 @@ class Editor extends React.Component {
 
   async handleFormSubmission (submissionEvent) {
     submissionEvent.preventDefault()
+    this.setState({ apiCallInFlight: true })
 
     const {
       title,
@@ -39,9 +42,13 @@ class Editor extends React.Component {
     const options = {
       method: 'post',
       url: getArticlesUrl(),
-      data: requestBody
+      data: requestBody,
+      headers: { ...getAuthenticationHeader() }
     }
-    await this.props.handleApiCall(options, () => this.props.navigate(`/article/${this.props.apiResponse.article.slug}`))
+    const {
+      data: { article }
+    } = await axios(options)
+    this.props.navigate(`/article/${article.slug}`)
   }
 
   handleFormChange (changeEvent) {
@@ -62,7 +69,8 @@ class Editor extends React.Component {
       title,
       description,
       body,
-      tags
+      tags,
+      apiCallInFlight
     } = this.state
 
     return (
@@ -75,7 +83,7 @@ class Editor extends React.Component {
                 description={description}
                 body={body}
                 tags={tags}
-                apiCallInFlight={this.props.apiCallInFlight}
+                apiCallInFlight={apiCallInFlight}
                 onChange={this.handleFormChange}
                 onSubmit={this.handleFormSubmission}
               />
@@ -149,5 +157,3 @@ function Form ({ title, description, body, tags, onChange, onSubmit, apiCallInFl
 function normalizeTags (tags) {
   return tags.split(',').map((tag) => tag.trim())
 }
-
-export default withAPIConnection(Editor)

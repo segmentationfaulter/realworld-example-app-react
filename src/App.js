@@ -3,7 +3,7 @@ import { Router } from '@reach/router'
 import axios from 'axios'
 
 import { getCurrentUserUrl } from './urls'
-import { getAuthenticationToken } from './lib/authToken'
+import { getAuthenticationToken, getAuthenticationHeader } from './lib/authToken'
 
 import RegistrationForm from './views/RegistrationForm'
 import LoginForm from './views/LoginForm'
@@ -43,9 +43,7 @@ export default class App extends React.Component {
     const requestConfig = {
       url: getCurrentUserUrl(),
       method: 'get',
-      headers: {
-        Authorization: `Token ${authToken}`
-      }
+      headers: { ...getAuthenticationHeader() }
     }
 
     const { data } = await axios(requestConfig)
@@ -69,7 +67,7 @@ export default class App extends React.Component {
           <Home path='/' userLoggedIn={userLoggedIn} />
           <RegistrationForm path='/register' setUser={this.setUser} />
           <LoginForm path='/login' setUser={this.setUser} />
-          <Editor path='/editor/:slug' />
+          <Editor path='/editor/' />
           <Article path='/article/:slug' userLoggedIn={userLoggedIn} />
         </Router>
         <Footer />
