@@ -1,6 +1,5 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const webpack = require('webpack')
 
 module.exports = {
   entry: './src/index.js',
@@ -9,7 +8,6 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     publicPath: '/'
   },
-  mode: 'development',
   module: {
     rules: [
       {
@@ -23,13 +21,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'Conduit',
       template: './index.html'
-    }),
-    new webpack.HotModuleReplacementPlugin()
-  ],
-  devtool: 'eval-source-map',
-  devServer: {
-    contentBase: path.join(__dirname, 'dist'),
-    historyApiFallback: true,
-    hot: true
-  }
+    })
+  ]
 }

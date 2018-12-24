@@ -7,8 +7,8 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "build": "webpack",
-    "start": "webpack-dev-server --open",
+    "build": "webpack --config webpack.prod.js",
+    "start": "webpack-dev-server --open --config webpack.dev.js",
     "test": "jest",
     "t:watch": "jest --watch",
     "lint": "standard"
@@ -28,7 +28,8 @@
     "standard": "^12.0.1",
     "webpack": "^4.17.2",
     "webpack-cli": "^3.1.0",
-    "webpack-dev-server": "^3.1.7"
+    "webpack-dev-server": "^3.1.7",
+    "webpack-merge": "^4.1.5"
   },
   "dependencies": {
     "@reach/router": "^1.2.1",
