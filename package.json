@@ -10,7 +10,8 @@
     "build": "webpack",
     "start": "webpack-dev-server --open",
     "test": "jest",
-    "t:watch": "jest --watch"
+    "t:watch": "jest --watch",
+    "lint": "standard"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
