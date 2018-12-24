@@ -5,5 +5,5 @@ It is a Medium.com clone work in progress. The motivation behind this small app 
 ## Development
 
 - Clone the repo
-- `yarn`
-- `yarn start`
+- `yarn` to install dependencies
+- `yarn start` to run the development server
